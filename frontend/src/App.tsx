@@ -4,13 +4,14 @@
 /* eslint-disable node/no-extraneous-import */
 import { ethers } from "ethers";
 import { Web3Provider, JsonRpcSigner } from "@ethersproject/providers";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { address } from "./contracts/address.json";
 import { abi } from "./contracts/abi.json";
 import { Greeter, Greeter__factory } from "../../typechain";
+import { getSigner } from "./utils/provider";
 
 let provider: Web3Provider;
-let signer: JsonRpcSigner;
+// let signer: JsonRpcSigner;
 let greeterContract: Greeter;
 
 function App() {
@@ -18,6 +19,15 @@ function App() {
   const [message, setMessage] = useState("");
   const [status, setStatus] = useState("");
   const [balance, setBalance] = useState("");
+  const [signer, setSigner] = useState<JsonRpcSigner>();
+
+  useEffect(() => {
+    if (window.ethereum) {
+      getSigner().then((initialSigner) => {
+        initialSigner && setSigner(initialSigner);
+      });
+    }
+  }, []);
 
   // connect via metamask web3 provider
   async function connect() {
